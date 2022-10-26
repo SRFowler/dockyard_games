@@ -2,7 +2,8 @@ defmodule Games.Wordle do
 
 
   def feedback(answer, guess) when answer == guess do
-    [:green, :green, :green, :green, :green]
+    len = String.length(answer)
+    for _ <- 1..len, do: :green
   end
 
   def feedback(answer, guess) do
