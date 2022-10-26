@@ -7,31 +7,32 @@ defmodule Games.Wordle do
   end
 
   def feedback(answer, guess) do
-    answer = String.split(answer, "", trim: true)
-    guess = String.split(guess, "", trim: true)
-    result = for letter <- guess do Enum.member?(answer, letter) end
-
-    word_length = length(guess) - 1
-
-    for x <- 0..word_length do
-        cond do
-          Enum.at(answer, x) != Enum.at(guess, x) and Enum.at(result, x) == true -> :yellow
-          Enum.at(answer, x) == Enum.at(guess, x) -> :green
-          Enum.at(result, x) == false -> :grey
-        end
-    end
-
+    [answer, guess]
+    |> Enum.map(fn str -> String.downcase(str) |> String.split("", trim: true) end)
+    |> check_green()
+    |> check_yellow_grey()
   end
 
-  def feedback2(answer, guess) do
-    answer = String.split(answer, "", trim: true)
-    guess = String.split(guess, "", trim: true)
+ def check_green([answer, guess]) do
+   {remaining_letters, guess} =
+    [answer, guess]
+    |> List.zip()
+    |> Enum.map(fn {answer, guess} -> if answer == guess, do: {nil, :green}, else: {answer, guess} end)
+    |> Enum.unzip()
 
+    [Enum.filter(remaining_letters, fn elem -> is_binary(elem) end), guess]
+ end
 
-  end
+ def check_yellow_grey([answer, guess]) do
+   {_, guess} =
+    Enum.reduce(guess, {answer, []}, fn elem, {answer, result} ->
+      cond do
+        elem == :green -> {answer, [:green | result]}
+        elem in answer -> {answer -- [elem], [:yellow | result]}
+        true -> {answer, [:grey | result]}
+      end
+    end)
 
-  @spec only_green([char()], [char()]) :: boolean()
-  defp only_green(answer, guess) do
-    Enum.zip(answer, guess)
-  end
+    Enum.reverse(guess)
+ end
 end
