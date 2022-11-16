@@ -57,6 +57,8 @@ defmodule WordleTest do
         long_string = String.duplicate("Z", len)
         grey1 = String.duplicate("g", len)
         grey2 = String.duplicate("b", len)
+        yellow1 = String.duplicate("wm", div(len, 2))
+        yellow2 = String.duplicate("mw", div(len, 2))
 
 
         Benchee.run(%{
@@ -65,26 +67,15 @@ defmodule WordleTest do
           "All Green LONG" => fn -> Games.Wordle.feedback(long_string, long_string) end,
           "All Grey 5" => fn -> Games.Wordle.feedback("lapse", "quick") end,
           "All Grey 10" => fn -> Games.Wordle.feedback("aaaaaaaaaa", "zzzzzzzzzz") end,
-          "All Grey LONG" => fn -> Games.Wordle.feedback(grey1, grey2) end
-        })
-      end
-    end
-
-    describe "Benchmarks 2" do
-      @describetag :benchee
-
-      @tag timeout: 120000
-      test "Larger test suite" do
-        Benchee.run(%{
-          "All Grey" => fn -> Games.Wordle.feedback("lapse", "quick") end,
-          "All Yellow" => fn -> Games.Wordle.feedback("lapse", "alsep") end,
+          "All Grey LONG" => fn -> Games.Wordle.feedback(grey1, grey2) end,
+          "5 Yellow" => fn -> Games.Wordle.feedback("abcde", "edabc") end,
+          "10 Yellow" => fn -> Games.Wordle.feedback("llllliiiii", "iiiiilllll") end,
+          "All Yellow Long" => fn -> Games.Wordle.feedback(yellow1, yellow2) end,
           "3 Green 2 Yellow" => fn -> Games.Wordle.feedback("lapse", "lapes") end,
           "4 Grey 1 Yellow" => fn -> Games.Wordle.feedback("lapse", "xzwts") end,
           "3 Grey 2 Yellow" => fn -> Games.Wordle.feedback("lapse", "xzwas") end,
           "3 Green 2 Grey" => fn -> Games.Wordle.feedback("lapse", "lapzq") end
         })
       end
-
     end
-
 end
